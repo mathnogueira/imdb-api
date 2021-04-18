@@ -12,8 +12,29 @@ const moviesPerPage = 50
 // Crawler is responsible for retrieving information from the top 1000 movies from IMDB
 type Crawler struct{}
 
-// Start the crawler
-func (crawler *Crawler) Start(movieChannel chan Movie, doneChannel chan bool) {
+// GetTopMovies opens IMDB and retrieve its top 1000 movies
+func (crawler *Crawler) GetTopMovies() []Movie {
+	movieChannel := make(chan Movie)
+	doneChannel := make(chan bool)
+	movies := make([]Movie, 0)
+
+	go crawler.start(movieChannel, doneChannel)
+
+loop:
+	for {
+		select {
+		case movie := <-movieChannel:
+			movies = append(movies, movie)
+		case <-doneChannel:
+			break loop
+		}
+	}
+
+	return movies
+}
+
+// start the crawler
+func (crawler *Crawler) start(movieChannel chan Movie, doneChannel chan bool) {
 	var wg sync.WaitGroup
 	for moviePosition := 1; moviePosition < 1000; moviePosition += moviesPerPage {
 		wg.Add(1)
