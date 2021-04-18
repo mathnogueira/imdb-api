@@ -80,12 +80,14 @@ func (storage *Storage) createMovies(createMoviesRequest createMoviesRequest) er
 }
 
 func (storage *Storage) getCreateMoviesHTTPRequest(createMoviesRequest createMoviesRequest) (*http.Request, error) {
+	endpointURL := fmt.Sprintf("%s/api/movies", storage.options.StorageURL)
+
 	requestBytes, err := json.Marshal(createMoviesRequest)
 	if err != nil {
 		return nil, fmt.Errorf("Could not send request to storage: %w", err)
 	}
 
-	request, err := http.NewRequest("POST", storage.options.StorageURL, bytes.NewBuffer(requestBytes))
+	request, err := http.NewRequest("POST", endpointURL, bytes.NewBuffer(requestBytes))
 	request.Header.Set("Content-Type", "application/json")
 
 	return request, nil
