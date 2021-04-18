@@ -29,12 +29,13 @@ var _ = Describe("CreateMovies", func() {
 
 	BeforeSuite(func() {
 		server = api.NewServer(9876)
-		go server.Start()
+		go func() {
+			server.Start()
+		}()
 	})
 
 	AfterSuite(func() {
 		err := server.Close()
-
 		Expect(err).ShouldNot(HaveOccurred())
 	})
 
