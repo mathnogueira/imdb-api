@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/avast/retry-go"
 )
 
 // Storage represents the service that is responsible for storing and indexing movies
@@ -64,19 +66,9 @@ func (storage *Storage) createMovies(createMoviesRequest createMoviesRequest) er
 		return err
 	}
 
-	client := &http.Client{}
-	response, err := client.Do(request)
-
-	if err != nil {
-		return fmt.Errorf("Could not execute request: %w", err)
-	}
-
-	defer response.Body.Close()
-	if response.StatusCode != 201 {
-		return fmt.Errorf("Response obtained from storage is unexpected. Expected 201, got %d", response.StatusCode)
-	}
-
-	return nil
+	return retry.Do(func() error {
+		return executeRequest(request)
+	}, retry.Attempts(3))
 }
 
 func (storage *Storage) getCreateMoviesHTTPRequest(createMoviesRequest createMoviesRequest) (*http.Request, error) {
@@ -91,4 +83,20 @@ func (storage *Storage) getCreateMoviesHTTPRequest(createMoviesRequest createMov
 	request.Header.Set("Content-Type", "application/json")
 
 	return request, nil
+}
+
+func executeRequest(request *http.Request) error {
+	client := &http.Client{}
+	response, err := client.Do(request)
+
+	if err != nil {
+		return fmt.Errorf("Could not execute request: %w", err)
+	}
+
+	defer response.Body.Close()
+	if response.StatusCode != 201 {
+		return fmt.Errorf("Response obtained from storage is unexpected. Expected 201, got %d", response.StatusCode)
+	}
+
+	return nil
 }
