@@ -26,7 +26,7 @@ func NewStorage(options StorageOptions) *Storage {
 
 // createMoviesRequest is used to serialize the DTO to JSON
 type createMoviesRequest struct {
-	movies []movieDTO `json:"movies"`
+	Movies []movieDTO `json:"movies"`
 }
 
 type movieDTO struct {
@@ -52,7 +52,7 @@ func (storage *Storage) Save(movies []Movie) error {
 	}
 
 	createMoviesRequest := createMoviesRequest{
-		movies: moviesDTO,
+		Movies: moviesDTO,
 	}
 
 	return storage.createMovies(createMoviesRequest)
