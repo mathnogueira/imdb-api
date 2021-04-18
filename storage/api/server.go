@@ -1,7 +1,9 @@
 package api
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -25,12 +27,15 @@ func (server *Server) Start() {
 	setupRoutes(server.echoInstance)
 
 	portBinding := fmt.Sprintf(":%d", server.Port)
-	server.echoInstance.Logger.Fatal(server.echoInstance.Start(portBinding))
+
+	if err := server.echoInstance.Start(portBinding); err != nil && err != http.ErrServerClosed {
+		server.echoInstance.Logger.Fatal(err)
+	}
 }
 
 // Close makes the server quit gracefully
 func (server *Server) Close() error {
-	return server.echoInstance.Close()
+	return server.echoInstance.Shutdown(context.Background())
 }
 
 // GetAddress returns the URL to access the server
