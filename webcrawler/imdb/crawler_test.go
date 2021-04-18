@@ -1,16 +1,16 @@
 package imdb_test
 
 import (
+	"github.com/mathnogueira/imdb-api/webcrawler/imdb"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"github.com/mathnogueira/imdb-api/webcrawler/imdb"
 )
 
 var _ = Describe("IMDB Crawler", func() {
 
 	It("Should be able to parse movies from IMDB page", func() {
-		extractedMovies := extractMovies()
+		crawler := imdb.NewCrawler()
+		extractedMovies := crawler.GetTopMovies()
 
 		Expect(len(extractedMovies)).To(Equal(1000))
 
@@ -21,24 +21,3 @@ var _ = Describe("IMDB Crawler", func() {
 		}
 	})
 })
-
-func extractMovies() []imdb.Movie {
-	movieChannel := make(chan imdb.Movie)
-	doneChannel := make(chan bool)
-	movies := make([]imdb.Movie, 0)
-
-	crawler := imdb.NewCrawler()
-	go crawler.Start(movieChannel, doneChannel)
-
-loop:
-	for {
-		select {
-		case movie := <-movieChannel:
-			movies = append(movies, movie)
-		case <-doneChannel:
-			break loop
-		}
-	}
-
-	return movies
-}
