@@ -35,7 +35,7 @@ var _ = Describe("MemoryStorage", func() {
 
 		listOfUsersWithSurnameDoe := storage.Get("Doe")
 
-		Expect(len(listOfUsersWithSurnameDoe)).To(Equal(2))
+		Expect(listOfUsersWithSurnameDoe).To(HaveLen(2))
 	})
 
 	It("Should not duplicate items in the same bucket in case of duplicated keys", func() {
@@ -48,7 +48,7 @@ var _ = Describe("MemoryStorage", func() {
 
 		listOfUsersNamedObu := storage.Get("Obu")
 
-		Expect(len(listOfUsersNamedObu)).To(Equal(1))
+		Expect(listOfUsersNamedObu).To(HaveLen(1))
 	})
 
 	It("Should return items that have all provided keys", func() {
@@ -58,7 +58,7 @@ var _ = Describe("MemoryStorage", func() {
 
 		items := storage.Search([]string{"John", "Cena"})
 
-		Expect(len(items)).To(Equal(1))
+		Expect(items).To(HaveLen(1))
 
 		johnCenaUser := items[0].GetContent().(user)
 
