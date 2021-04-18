@@ -10,13 +10,7 @@ import (
 const moviesPerPage = 50
 
 // Crawler is responsible for retrieving information from the top 1000 movies from IMDB
-type Crawler struct {
-	options CrawlerOptions
-}
-
-// CrawlerOptions holds the configuration regarding how the crawler should work
-type CrawlerOptions struct {
-}
+type Crawler struct{}
 
 // Start the crawler
 func (crawler *Crawler) Start(movieChannel chan Movie, doneChannel chan bool) {
@@ -55,6 +49,6 @@ func (crawler *Crawler) crawlMovieRankingPage(startingPosition int, movieChannel
 }
 
 // NewCrawler creates a new instance of a IMDB crawler
-func NewCrawler(options CrawlerOptions) *Crawler {
-	return &Crawler{options: options}
+func NewCrawler() *Crawler {
+	return &Crawler{}
 }

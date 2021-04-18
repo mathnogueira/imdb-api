@@ -1,8 +1,6 @@
 package imdb_test
 
 import (
-	"fmt"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -12,9 +10,7 @@ import (
 var _ = Describe("IMDB Crawler", func() {
 
 	It("Should be able to parse movies from IMDB page", func() {
-		options := imdb.CrawlerOptions{}
-
-		extractedMovies := extractMovies(options)
+		extractedMovies := extractMovies()
 
 		Expect(len(extractedMovies)).To(Equal(1000))
 
@@ -26,12 +22,12 @@ var _ = Describe("IMDB Crawler", func() {
 	})
 })
 
-func extractMovies(options imdb.CrawlerOptions) []imdb.Movie {
+func extractMovies() []imdb.Movie {
 	movieChannel := make(chan imdb.Movie)
 	doneChannel := make(chan bool)
 	movies := make([]imdb.Movie, 0)
 
-	crawler := imdb.NewCrawler(options)
+	crawler := imdb.NewCrawler()
 	go crawler.Start(movieChannel, doneChannel)
 
 loop:
@@ -42,10 +38,6 @@ loop:
 		case <-doneChannel:
 			break loop
 		}
-	}
-
-	for _, movie := range movies {
-		fmt.Println(movie)
 	}
 
 	return movies
