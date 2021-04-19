@@ -119,6 +119,26 @@ var _ = Describe("CreateMovies", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 		Expect(httpResponse.StatusCode).To(Equal(http.StatusBadRequest))
 	})
+
+	It("Should return status 400 when an invalid json is provided", func() {
+		invalidJsonObject := struct {
+			Value int
+		}{
+			Value: 28,
+		}
+
+		request := testing.Request{
+			Method:  "POST",
+			URL:     fmt.Sprintf("%s/api/movies", server.GetAddress()),
+			Payload: invalidJsonObject,
+		}
+
+		var response map[string]interface{}
+		httpResponse, err := testing.SendRequest(request, &response)
+
+		Expect(err).ShouldNot(HaveOccurred())
+		Expect(httpResponse.StatusCode).To(Equal(http.StatusBadRequest))
+	})
 })
 
 func insertMovies(movies []movieDTO, server *api.Server) (*testing.Response, error) {
