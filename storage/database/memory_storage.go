@@ -1,6 +1,9 @@
 package database
 
-import "sync"
+import (
+	"strings"
+	"sync"
+)
 
 // MemoryStorage is an implementation of the interface Storage that doesn't persist any data
 // on secondary memory. It relies on primary memory only.
@@ -17,7 +20,7 @@ func NewMemoryStorage() Storage {
 
 // Save saves an item
 func (memoryStorage *MemoryStorage) Save(item Item) error {
-	keys := item.GetKeys()
+	keys := getLowercaseKeys(item.GetKeys())
 	for _, key := range keys {
 		if bucket, bucketExists := memoryStorage.buckets[key]; bucketExists {
 			if !doesItemAlreadyExistsOnBucket(bucket, &item) {
@@ -43,6 +46,7 @@ func doesItemAlreadyExistsOnBucket(bucket []*Item, item *Item) bool {
 
 // Get retrieves all items that are identified by the key
 func (memoryStorage *MemoryStorage) Get(key string) []*Item {
+	key = strings.ToLower(key)
 	items := make([]*Item, 0)
 	if bucket, bucketExists := memoryStorage.buckets[key]; bucketExists {
 		for _, item := range bucket {
@@ -58,6 +62,8 @@ func (memoryStorage *MemoryStorage) Get(key string) []*Item {
 // by all those keys. If no results are returned, it means that no item stored in the storage can be
 // identified by all keys at the same time.
 func (memoryStorage *MemoryStorage) Search(keys []string) []Item {
+	var mutex sync.Mutex
+	keys = getLowercaseKeys(keys)
 	itemOccurrencesCounter := make(map[*Item]int, 0)
 	var wg sync.WaitGroup
 	for _, k := range keys {
@@ -67,11 +73,13 @@ func (memoryStorage *MemoryStorage) Search(keys []string) []Item {
 			items := memoryStorage.Get(key)
 
 			for _, item := range items {
+				mutex.Lock()
 				if numberOccurrences, itemFound := itemOccurrencesCounter[item]; itemFound {
 					itemOccurrencesCounter[item] = numberOccurrences + 1
 				} else {
 					itemOccurrencesCounter[item] = 1
 				}
+				mutex.Unlock()
 			}
 
 			wg.Done()
@@ -89,4 +97,13 @@ func (memoryStorage *MemoryStorage) Search(keys []string) []Item {
 	}
 
 	return searchResults
+}
+
+func getLowercaseKeys(keys []string) []string {
+	lowercaseKeys := make([]string, 0, len(keys))
+	for _, key := range keys {
+		lowercaseKeys = append(lowercaseKeys, strings.ToLower(key))
+	}
+
+	return lowercaseKeys
 }

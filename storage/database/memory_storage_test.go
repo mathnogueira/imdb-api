@@ -64,6 +64,18 @@ var _ = Describe("MemoryStorage", func() {
 
 		Expect(johnCenaUser.Name).To(Equal("John Cena"))
 	})
+
+	It("lowercase and uppercase keys should return the same results", func() {
+		for _, user := range users {
+			storage.Save(user)
+		}
+
+		itemsFromLowercaseKeys := storage.Search([]string{"john", "cena"})
+		itemsFromUppercaseKeys := storage.Search([]string{"JOHN", "CENA"})
+
+		Expect(itemsFromLowercaseKeys).To(HaveLen(1))
+		Expect(itemsFromUppercaseKeys).To(HaveLen(1))
+	})
 })
 
 type user struct {
