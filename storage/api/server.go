@@ -6,25 +6,32 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/mathnogueira/imdb-api/storage/database"
+	"github.com/mathnogueira/imdb-api/storage/movie"
 )
 
 // Server represents the HTTP Web Server that will receive the requests for this service
 type Server struct {
 	Port         int
 	echoInstance *echo.Echo
+
+	movieRepository *movie.Repository
 }
 
 // NewServer creates a new HTTP Server
 func NewServer(port int) *Server {
+	memoryStorage := database.NewMemoryStorage()
+
 	return &Server{
-		Port:         port,
-		echoInstance: echo.New(),
+		Port:            port,
+		echoInstance:    echo.New(),
+		movieRepository: movie.NewRepository(memoryStorage),
 	}
 }
 
 // Start the server
 func (server *Server) Start() {
-	setupRoutes(server.echoInstance)
+	server.setupRoutes()
 
 	portBinding := fmt.Sprintf(":%d", server.Port)
 

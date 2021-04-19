@@ -5,6 +5,8 @@ import (
 	"github.com/mathnogueira/imdb-api/storage/api/movie"
 )
 
-func setupRoutes(echoInstance *echo.Echo) {
-	echoInstance.POST("/api/movies", movie.CreateMovies)
+func (server *Server) setupRoutes() {
+	server.echoInstance.POST("/api/movies", func(c echo.Context) error {
+		return movie.CreateMovies(c, server.movieRepository)
+	})
 }

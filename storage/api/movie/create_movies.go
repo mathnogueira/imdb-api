@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/mathnogueira/imdb-api/storage/movie"
 )
 
 type createMoviesRequest struct {
@@ -20,7 +21,7 @@ type createMoviesRequest struct {
 
 // CreateMovies receives a list of movies and index them in a in-memory data structure
 // optimized for search.
-func CreateMovies(c echo.Context) error {
+func CreateMovies(c echo.Context, movieRepository *movie.Repository) error {
 	requestBytes, err := ioutil.ReadAll(c.Request().Body)
 	if err != nil {
 		return fmt.Errorf("Could not read request body: %w", err)
@@ -37,6 +38,8 @@ func CreateMovies(c echo.Context) error {
 	if len(validationErrors) > 0 {
 		return c.JSON(http.StatusBadRequest, errorResponse{Errors: validationErrors})
 	}
+
+	saveMoviesIntoStorage(request, movieRepository)
 	return c.NoContent(201)
 }
 
@@ -64,4 +67,18 @@ func validateCreateMoviesRequest(request createMoviesRequest) []string {
 	}
 
 	return errors
+}
+
+func saveMoviesIntoStorage(request createMoviesRequest, movieRepository *movie.Repository) {
+	for _, movieDTO := range request.Movies {
+		movie := movie.Movie{
+			ID:       movieDTO.ID,
+			Name:     movieDTO.Name,
+			Director: movieDTO.Director,
+			Cast:     movieDTO.Cast,
+		}
+
+		movieRepository.Save(movie)
+	}
+
 }
