@@ -31,7 +31,12 @@ var _ = Describe("Persistence", func() {
 		spielbergMovies := repository.Search([]string{"spielberg"})
 
 		Expect(spielbergMovies).To(HaveLen(2))
-		Expect(spielbergMovies[0].Name).To(Equal("Jurassic Park"))
-		Expect(spielbergMovies[1].Name).To(Equal("Jaws"))
+		movieNames := []string{
+			spielbergMovies[0].Name,
+			spielbergMovies[1].Name,
+		}
+
+		Expect(movieNames).Should(ContainElement("Jurassic Park"))
+		Expect(movieNames).Should(ContainElement("Jaws"))
 	})
 })
