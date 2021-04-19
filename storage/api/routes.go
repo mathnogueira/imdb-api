@@ -9,4 +9,8 @@ func (server *Server) setupRoutes() {
 	server.echoInstance.POST("/api/movies", func(c echo.Context) error {
 		return movie.CreateMovies(c, server.movieRepository)
 	})
+
+	server.echoInstance.POST("/api/movies/search", func(c echo.Context) error {
+		return movie.SearchMovies(c, server.movieRepository)
+	})
 }
