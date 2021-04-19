@@ -24,10 +24,10 @@ func (databaseItem DatabaseItem) GetContent() interface{} {
 func (databaseItem DatabaseItem) GetKeys() []string {
 	keys := make([]string, 0)
 
-	keys = append(keys, strings.Split(databaseItem.Content.Name, " ")...)
-	keys = append(keys, strings.Split(databaseItem.Content.Director, " ")...)
+	keys = append(keys, strings.Split(strings.ToLower(databaseItem.Content.Name), " ")...)
+	keys = append(keys, strings.Split(strings.ToLower(databaseItem.Content.Director), " ")...)
 	for _, castMember := range databaseItem.Content.Cast {
-		keys = append(keys, strings.Split(castMember, " ")...)
+		keys = append(keys, strings.Split(strings.ToLower(castMember), " ")...)
 	}
 
 	return keys
