@@ -46,6 +46,10 @@ func CreateMovies(c echo.Context, movieRepository *movie.Repository) error {
 func validateCreateMoviesRequest(request createMoviesRequest) []string {
 	errors := make([]string, 0)
 
+	if request.Movies == nil {
+		errors = append(errors, fmt.Sprintf("No movie provided"))
+	}
+
 	for movieIndex, movie := range request.Movies {
 		if movie.ID == "" {
 			errors = append(errors, fmt.Sprintf("Movie #%d: ID cannot be empty", movieIndex))
