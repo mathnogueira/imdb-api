@@ -29,9 +29,7 @@ var _ = Describe("CreateMovies", func() {
 
 	BeforeSuite(func() {
 		server = api.NewServer(9876)
-		go func() {
-			server.Start()
-		}()
+		go server.Start()
 	})
 
 	AfterSuite(func() {
@@ -40,130 +38,102 @@ var _ = Describe("CreateMovies", func() {
 	})
 
 	It("Should return status 201 when a valid JSON is provided", func() {
-		moviesJSON := createMoviesRequest{
-			Movies: []movieDTO{
-				{
-					ID:       "00123456",
-					Name:     "Jurassic Park",
-					Director: "Steven Spielberg",
-					Cast:     []string{"Sam Neil", "Jeff Goldblum"},
-				},
-				{
-					ID:       "00654321",
-					Name:     "Jaws",
-					Director: "Steven Spielberg",
-					Cast:     []string{"Roy Scheider", "Robert Shaw"},
-				},
+		movies := []movieDTO{
+			{
+				ID:       "00123456",
+				Name:     "Jurassic Park",
+				Director: "Steven Spielberg",
+				Cast:     []string{"Sam Neil", "Jeff Goldblum"},
+			},
+			{
+				ID:       "00654321",
+				Name:     "Jaws",
+				Director: "Steven Spielberg",
+				Cast:     []string{"Roy Scheider", "Robert Shaw"},
 			},
 		}
 
-		request := testing.Request{
-			Method:  "POST",
-			URL:     fmt.Sprintf("%s/api/movies", server.GetAddress()),
-			Payload: moviesJSON,
-		}
-
-		var response response
-		httpResponse, err := testing.SendRequest(request, &response)
+		httpResponse, err := insertMovies(movies, server)
 
 		Expect(err).ShouldNot(HaveOccurred())
 		Expect(httpResponse.StatusCode).To(Equal(http.StatusCreated))
 	})
 
 	It("Should return status 400 if movie ID is missing", func() {
-		moviesJSON := createMoviesRequest{
-			Movies: []movieDTO{
-				{
-					Name:     "Jurassic Park",
-					Director: "Steven Spielberg",
-					Cast:     []string{"Sam Neil", "Jeff Goldblum"},
-				},
+		movies := []movieDTO{
+			{
+				Name:     "Jurassic Park",
+				Director: "Steven Spielberg",
+				Cast:     []string{"Sam Neil", "Jeff Goldblum"},
 			},
 		}
 
-		request := testing.Request{
-			Method:  "POST",
-			URL:     fmt.Sprintf("%s/api/movies", server.GetAddress()),
-			Payload: moviesJSON,
-		}
-
-		var response response
-		httpResponse, err := testing.SendRequest(request, &response)
+		httpResponse, err := insertMovies(movies, server)
 
 		Expect(err).ShouldNot(HaveOccurred())
 		Expect(httpResponse.StatusCode).To(Equal(http.StatusBadRequest))
 	})
 
 	It("Should return status 400 if movie Name is missing", func() {
-		moviesJSON := createMoviesRequest{
-			Movies: []movieDTO{
-				{
-					ID:       "00123456",
-					Director: "Steven Spielberg",
-					Cast:     []string{"Sam Neil", "Jeff Goldblum"},
-				},
+		movies := []movieDTO{
+			{
+				ID:       "00123456",
+				Director: "Steven Spielberg",
+				Cast:     []string{"Sam Neil", "Jeff Goldblum"},
 			},
 		}
 
-		request := testing.Request{
-			Method:  "POST",
-			URL:     fmt.Sprintf("%s/api/movies", server.GetAddress()),
-			Payload: moviesJSON,
-		}
-
-		var response response
-		httpResponse, err := testing.SendRequest(request, &response)
+		httpResponse, err := insertMovies(movies, server)
 
 		Expect(err).ShouldNot(HaveOccurred())
 		Expect(httpResponse.StatusCode).To(Equal(http.StatusBadRequest))
 	})
 
 	It("Should return status 400 if movie Director is missing", func() {
-		moviesJSON := createMoviesRequest{
-			Movies: []movieDTO{
-				{
-					ID:   "00123456",
-					Name: "Jurassic Park",
-					Cast: []string{"Sam Neil", "Jeff Goldblum"},
-				},
+		movies := []movieDTO{
+			{
+				ID:   "00123456",
+				Name: "Jurassic Park",
+				Cast: []string{"Sam Neil", "Jeff Goldblum"},
 			},
 		}
 
-		request := testing.Request{
-			Method:  "POST",
-			URL:     fmt.Sprintf("%s/api/movies", server.GetAddress()),
-			Payload: moviesJSON,
-		}
-
-		var response response
-		httpResponse, err := testing.SendRequest(request, &response)
+		httpResponse, err := insertMovies(movies, server)
 
 		Expect(err).ShouldNot(HaveOccurred())
 		Expect(httpResponse.StatusCode).To(Equal(http.StatusBadRequest))
 	})
 
 	It("Should return status 400 if movie Cast member name is empty", func() {
-		moviesJSON := createMoviesRequest{
-			Movies: []movieDTO{
-				{
-					ID:       "00123456",
-					Name:     "Jurassic Park",
-					Director: "Steven Spielberg",
-					Cast:     []string{""},
-				},
+		movies := []movieDTO{
+			{
+				ID:       "00123456",
+				Name:     "Jurassic Park",
+				Director: "Steven Spielberg",
+				Cast:     []string{""},
 			},
 		}
 
-		request := testing.Request{
-			Method:  "POST",
-			URL:     fmt.Sprintf("%s/api/movies", server.GetAddress()),
-			Payload: moviesJSON,
-		}
-
-		var response response
-		httpResponse, err := testing.SendRequest(request, &response)
+		httpResponse, err := insertMovies(movies, server)
 
 		Expect(err).ShouldNot(HaveOccurred())
 		Expect(httpResponse.StatusCode).To(Equal(http.StatusBadRequest))
 	})
 })
+
+func insertMovies(movies []movieDTO, server *api.Server) (*testing.Response, error) {
+	moviesJSON := createMoviesRequest{
+		Movies: movies,
+	}
+
+	request := testing.Request{
+		Method:  "POST",
+		URL:     fmt.Sprintf("%s/api/movies", server.GetAddress()),
+		Payload: moviesJSON,
+	}
+
+	var response response
+	httpResponse, err := testing.SendRequest(request, &response)
+
+	return httpResponse, err
+}
