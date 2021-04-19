@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mathnogueira/imdb-api/storage/movie"
@@ -71,10 +70,5 @@ func getTermsFromRequest(httpRequest *http.Request) ([]string, error) {
 		return nil, fmt.Errorf("Could not parse request body as JSON: %w", err)
 	}
 
-	lowercaseTerms := make([]string, 0, len(request.Terms))
-	for _, term := range request.Terms {
-		lowercaseTerms = append(lowercaseTerms, strings.ToLower(term))
-	}
-
-	return lowercaseTerms, nil
+	return request.Terms, nil
 }

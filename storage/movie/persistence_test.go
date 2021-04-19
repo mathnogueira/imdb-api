@@ -28,7 +28,7 @@ var _ = Describe("Persistence", func() {
 	})
 
 	It("Should save and retrieve movies from storage", func() {
-		spielbergMovies := repository.Search([]string{"Spielberg"})
+		spielbergMovies := repository.Search([]string{"spielberg"})
 
 		Expect(spielbergMovies).To(HaveLen(2))
 		Expect(spielbergMovies[0].Name).To(Equal("Jurassic Park"))
