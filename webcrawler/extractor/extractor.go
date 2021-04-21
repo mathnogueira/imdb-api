@@ -1,4 +1,4 @@
-package crawler
+package extractor
 
 import (
 	"fmt"
@@ -6,10 +6,22 @@ import (
 	"github.com/mathnogueira/imdb-api/webcrawler/imdb"
 	"github.com/mathnogueira/imdb-api/webcrawler/movie"
 	"github.com/mathnogueira/imdb-api/webcrawler/transformation"
+	"go.uber.org/zap"
 )
 
+// Extractor is responsible for getting information from IMDB and sending it
+// to the storage API
+type Extractor struct {
+	logger *zap.Logger
+}
+
+// NewExtractor creates a new instance of a data extractor
+func NewExtractor(logger *zap.Logger) *Extractor {
+	return &Extractor{logger}
+}
+
 // Execute the crawler routine
-func Execute(options Options) error {
+func (extractor *Extractor) Execute(options Options) error {
 	imdbCrawler := imdb.NewCrawler()
 	storageOptions := movie.StorageOptions{
 		StorageURL: options.StorageURL,

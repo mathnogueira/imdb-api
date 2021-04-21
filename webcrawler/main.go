@@ -3,8 +3,9 @@ package main
 import (
 	"strings"
 
-	"github.com/mathnogueira/imdb-api/webcrawler/crawler"
+	"github.com/mathnogueira/imdb-api/webcrawler/extractor"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -14,8 +15,14 @@ func main() {
 		panic(err)
 	}
 
-	crawlerOptions := crawler.Options{StorageURL: config.GetString("storage.url")}
-	err = crawler.Execute(crawlerOptions)
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		panic(err)
+	}
+
+	crawlerOptions := extractor.Options{StorageURL: config.GetString("storage.url")}
+	extractor := extractor.NewExtractor(logger)
+	err = extractor.Execute(crawlerOptions)
 
 	if err != nil {
 		panic(err)

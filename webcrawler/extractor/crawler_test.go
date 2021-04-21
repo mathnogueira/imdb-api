@@ -1,4 +1,4 @@
-package crawler_test
+package extractor_test
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Crawler", func() {
+var _ = Describe("Extractor", func() {
 
 	It("Should execute without any error when storage API is online", func() {
 		server := setupMockServer()
