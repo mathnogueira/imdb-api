@@ -1,4 +1,4 @@
-package crawler
+package extractor
 
 // Options configures how the crawler will work.
 type Options struct {
