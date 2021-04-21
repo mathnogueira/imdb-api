@@ -3,6 +3,7 @@ package movie_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"go.uber.org/zap"
 
 	"github.com/mathnogueira/imdb-api/storage/database"
 	"github.com/mathnogueira/imdb-api/storage/movie"
@@ -11,10 +12,11 @@ import (
 var _ = Describe("Persistence", func() {
 
 	var repository *movie.Repository
+	logger := zap.NewNop()
 
 	BeforeEach(func() {
-		storage := database.NewMemoryStorage()
-		repository = movie.NewRepository(storage)
+		storage := database.NewMemoryStorage(logger)
+		repository = movie.NewRepository(storage, logger)
 
 		movies := []movie.Movie{
 			{Name: "Jurassic Park", Director: "Steven Spielberg", Cast: []string{"Sam Neil", "Jeff Goldblum"}},

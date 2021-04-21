@@ -6,15 +6,17 @@ import (
 	"github.com/mathnogueira/imdb-api/storage/database"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"go.uber.org/zap"
 )
 
 var _ = Describe("MemoryStorage", func() {
 
 	var storage database.Storage
 	var users []userItem
+	logger := zap.NewNop()
 
 	BeforeEach(func() {
-		storage = database.NewMemoryStorage()
+		storage = database.NewMemoryStorage(logger)
 		users = []userItem{
 			{
 				user{Name: "John Doe"},
