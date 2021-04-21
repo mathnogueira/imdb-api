@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/mathnogueira/imdb-api/storage/database"
 	"github.com/mathnogueira/imdb-api/storage/movie"
 )
@@ -32,6 +33,7 @@ func NewServer(port int) *Server {
 // Start the server
 func (server *Server) Start() {
 	server.setupRoutes()
+	server.echoInstance.Use(middleware.Logger())
 
 	portBinding := fmt.Sprintf(":%d", server.Port)
 
