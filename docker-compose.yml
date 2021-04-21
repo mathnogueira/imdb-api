@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+
+  storage_api:
+    build:
+      context: storage/
+      dockerfile: Dockerfile
+    ports: 
+      - "8000:8000"
+    networks: 
+      - movie_search_network
+
+  crawler:
+    build:
+      context: webcrawler/
+      dockerfile: Dockerfile
+    environment: 
+      CRAWLER_STORAGE_URL: "http://storage_api:8000"
+    networks:
+      - movie_search_network
+    depends_on: 
+      - storage_api
+
+networks: 
+  movie_search_network:
