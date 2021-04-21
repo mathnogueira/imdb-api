@@ -47,15 +47,8 @@ func SearchMovies(c echo.Context, movieRepository *movie.Repository) error {
 		response.Movies = append(response.Movies, movieDTO)
 	}
 
-	responseJSON, err := json.Marshal(response)
-	if err != nil {
-		return fmt.Errorf("Could not serialize response as JSON: %w", err)
-	}
-
-	c.Response().WriteHeader(http.StatusOK)
-	c.Response().Write(responseJSON)
-
-	return nil
+	c.Response().Header().Set("Content-Type", "application/json")
+	return c.JSON(http.StatusOK, response)
 }
 
 func getTermsFromRequest(httpRequest *http.Request) ([]string, error) {
