@@ -3,17 +3,21 @@ package database
 import (
 	"strings"
 	"sync"
+
+	"go.uber.org/zap"
 )
 
 // MemoryStorage is an implementation of the interface Storage that doesn't persist any data
 // on secondary memory. It relies on primary memory only.
 type MemoryStorage struct {
 	buckets map[string][]*Item
+	logger  *zap.Logger
 }
 
 // NewMemoryStorage creates a new in-memory storage
-func NewMemoryStorage() Storage {
+func NewMemoryStorage(logger *zap.Logger) Storage {
 	return &MemoryStorage{
+		logger:  logger,
 		buckets: make(map[string][]*Item, 0),
 	}
 }
@@ -21,6 +25,9 @@ func NewMemoryStorage() Storage {
 // Save saves an item
 func (memoryStorage *MemoryStorage) Save(item Item) error {
 	keys := getLowercaseKeys(item.GetKeys())
+	memoryStorage.logger.Debug("Saving new item in storage",
+		zap.Strings("keys", keys),
+	)
 	for _, key := range keys {
 		if bucket, bucketExists := memoryStorage.buckets[key]; bucketExists {
 			if !doesItemAlreadyExistsOnBucket(bucket, &item) {
@@ -66,10 +73,9 @@ func (memoryStorage *MemoryStorage) Search(keys []string) []Item {
 	keys = getLowercaseKeys(keys)
 	itemOccurrencesCounter := make(map[*Item]int, 0)
 	var wg sync.WaitGroup
-	for _, k := range keys {
-		key := k
+	for _, key := range keys {
 		wg.Add(1)
-		go func() {
+		go func(key string) {
 			items := memoryStorage.Get(key)
 
 			for _, item := range items {
@@ -83,7 +89,7 @@ func (memoryStorage *MemoryStorage) Search(keys []string) []Item {
 			}
 
 			wg.Done()
-		}()
+		}(key)
 	}
 
 	wg.Wait()
