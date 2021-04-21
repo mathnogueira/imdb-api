@@ -23,8 +23,6 @@ type Server struct {
 
 // NewServer creates a new HTTP Server
 func NewServer(port int) *Server {
-	memoryStorage := database.NewMemoryStorage()
-
 	logger, err := zap.NewDevelopment(
 		zap.Fields(zap.String("app", "storage-api")),
 	)
@@ -32,6 +30,8 @@ func NewServer(port int) *Server {
 	if err != nil {
 		panic(err)
 	}
+
+	memoryStorage := database.NewMemoryStorage(logger)
 
 	return &Server{
 		Port:            port,
