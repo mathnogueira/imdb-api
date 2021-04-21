@@ -11,10 +11,12 @@ Storage API uses port 8000. If it is in use, change it by editing the docker-com
 
 ## Assumptions made
 
-* When crawling IMDB page, I just got the information from the listing itself. I didn't open each page to get all the information about a movie. I did this because the listing page had most of the information needed already (movie name, director and two most important cast members). By doing this, if you search for actors that didn't star in a movie, probably no result will be returned.
-* Search terms must be a single word. This happens because when inserting a movie into the storage, I create keys for that movie. These keys are one word each and are used for searching inside a map. If you pass a term "jurassic park", no results will be returned by the API.
+* When crawling IMDB page, I just got the information from the movie listing, I didn't open each page to get all the information about each movie. I did this because the listing page had most of the information needed (movie name, director and two most important cast members). This reduces the number of terms that you can use to identify a movie and can impact the API results if you search for cast members that are not the main stars of the movie.
+
+* Search terms must be a single word. This happens because when inserting a movie into the storage, the API creates a set of keys for that movie. These keys are one word each and are used for searching inside a map. If you enter "jurassic park" as a term, no results will be returned by the API. But ["jurassic", "park"] will work fine.
 
 ## What would I do if I had more time
 
 * Create more test scenarios to cover not only the happy path of the application;
 * Parse the IMDB movie page to extract more information about it, such as genre, year and the complete cast list;
+* Write a performance test to check how many requests per second this service can handle;
