@@ -22,11 +22,13 @@ func NewExtractor(logger *zap.Logger) *Extractor {
 
 // Execute the crawler routine
 func (extractor *Extractor) Execute(options Options) error {
-	imdbCrawler := imdb.NewCrawler()
+	imdbCrawler := imdb.NewCrawler(extractor.logger)
 	storageOptions := movie.StorageOptions{
 		StorageURL: options.StorageURL,
 	}
 	storage := movie.NewStorage(storageOptions)
+
+	extractor.logger.Debug("Executing extraction", zap.String("storageURL", options.StorageURL))
 
 	imdbMovies := imdbCrawler.GetTopMovies()
 	movies := make([]movie.Movie, 0, len(imdbMovies))

@@ -15,7 +15,9 @@ func main() {
 		panic(err)
 	}
 
-	logger, err := zap.NewDevelopment()
+	logger, err := zap.NewDevelopment(zap.Fields(
+		zap.String("app", "crawler"),
+	))
 	if err != nil {
 		panic(err)
 	}

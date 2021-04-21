@@ -5,12 +5,15 @@ import (
 	"sync"
 
 	"github.com/gocolly/colly"
+	"go.uber.org/zap"
 )
 
 const moviesPerPage = 50
 
 // Crawler is responsible for retrieving information from the top 1000 movies from IMDB
-type Crawler struct{}
+type Crawler struct {
+	logger *zap.Logger
+}
 
 // GetTopMovies opens IMDB and retrieve its top 1000 movies
 func (crawler *Crawler) GetTopMovies() []Movie {
@@ -24,6 +27,11 @@ loop:
 	for {
 		select {
 		case movie := <-movieChannel:
+			crawler.logger.Debug("New movie found",
+				zap.String("URL", movie.URL),
+				zap.String("name", movie.Name),
+			)
+
 			movies = append(movies, movie)
 		case <-doneChannel:
 			break loop
@@ -70,6 +78,6 @@ func (crawler *Crawler) crawlMovieRankingPage(startingPosition int, movieChannel
 }
 
 // NewCrawler creates a new instance of a IMDB crawler
-func NewCrawler() *Crawler {
-	return &Crawler{}
+func NewCrawler(logger *zap.Logger) *Crawler {
+	return &Crawler{logger}
 }
