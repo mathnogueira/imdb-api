@@ -7,6 +7,8 @@ There is a docker-compose file that already configures both crawler and storage 
 $ docker-compose up
 ```
 
+By executing the command above, the webcrawler will run and populate the in-memory database and you can start search movies.
+
 Storage API uses port 8000. If it is in use, change it by editing the docker-compose file.
 
 ## Assumptions made
@@ -20,3 +22,11 @@ Storage API uses port 8000. If it is in use, change it by editing the docker-com
 * Create more test scenarios to cover not only the happy path of the application;
 * Parse the IMDB movie page to extract more information about it, such as genre, year and the complete cast list;
 * Write a performance test to check how many requests per second this service can handle;
+
+## API
+```
+POST http://localhost:8000/api/movies/search
+{
+    "terms": ["term1", "term2"]
+}
+```
